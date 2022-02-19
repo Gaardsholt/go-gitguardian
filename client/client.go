@@ -53,11 +53,13 @@ func New(opts ...ClientOption) (*Client, error) {
 }
 
 func (c *Client) NewRequest(method string, path string, payload *bytes.Buffer) (*http.Request, error) {
+	// Convert server address to *url.URL
 	serverURL, err := url.Parse(c.Server)
 	if err != nil {
 		return nil, err
 	}
 
+	// Add path to server address
 	queryURL, err := serverURL.Parse(path)
 	if err != nil {
 		return nil, err
