@@ -48,10 +48,7 @@ If you are running a self hosted version of GitGuardian you can also set the ser
 
 ## Stuff missing from this library
 
-  * The [incidents](https://api.gitguardian.com/docs#tag/Incidents) endpoint hasn't been implemented yet.
   * Better logging
   * Do a checkup on the error handling
   * Add tests
-  * Maybe make it available as a command line tool?
   * Properly more...
-
