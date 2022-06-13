@@ -10,23 +10,21 @@ type IncidentListResult struct {
 }
 
 type IncidentListResponse struct {
-	ID              int64       `json:"id"`
-	Date            string      `json:"date"`
-	Detector        Detector    `json:"detector"`
-	SecretHash      string      `json:"secret_hash"`
-	GitguardianURL  string      `json:"gitguardian_url"`
-	Regression      bool        `json:"regression"`
-	Status          string      `json:"status"`
-	AssigneeEmail   string      `json:"assignee_email"`
-	OccurrenceCount int64       `json:"occurrence_count"`
-	Occurrences     interface{} `json:"occurrences"`
-	IgnoreReason    string      `json:"ignore_reason"`
-	IgnoredAt       string      `json:"ignored_at"`
-	SecretRevoked   bool        `json:"secret_revoked"`
-	Severity        string      `json:"severity"`
-	Validity        string      `json:"validity"`
-	ResolvedAt      interface{} `json:"resolved_at"`
-	ShareURL        string      `json:"share_url"`
+	ID              int64    `json:"id"`
+	Date            string   `json:"date"`
+	Detector        Detector `json:"detector"`
+	SecretHash      string   `json:"secret_hash"`
+	GitguardianURL  string   `json:"gitguardian_url"`
+	Regression      bool     `json:"regression"`
+	Status          string   `json:"status"`
+	AssigneeEmail   string   `json:"assignee_email"`
+	OccurrenceCount int64    `json:"occurrence_count"`
+	IgnoreReason    string   `json:"ignore_reason"`
+	IgnoredAt       string   `json:"ignored_at"`
+	SecretRevoked   bool     `json:"secret_revoked"`
+	Severity        string   `json:"severity"`
+	Validity        string   `json:"validity"`
+	ShareURL        string   `json:"share_url"`
 }
 
 type Detector struct {
@@ -58,7 +56,6 @@ type IncidentGetResponse struct {
 	Validity        string       `json:"validity"`
 	IgnoredAt       string       `json:"ignored_at"`
 	SecretRevoked   bool         `json:"secret_revoked"`
-	ResolvedAt      interface{}  `json:"resolved_at"`
 	ShareURL        string       `json:"share_url"`
 }
 
@@ -78,13 +75,11 @@ type Occurrence struct {
 }
 
 type Match struct {
-	Name          string      `json:"name"`
-	IndiceStart   int64       `json:"indice_start"`
-	IndiceEnd     int64       `json:"indice_end"`
-	PreLineStart  interface{} `json:"pre_line_start"`
-	PreLineEnd    interface{} `json:"pre_line_end"`
-	PostLineStart int64       `json:"post_line_start"`
-	PostLineEnd   int64       `json:"post_line_end"`
+	Name          string `json:"name"`
+	IndiceStart   int64  `json:"indice_start"`
+	IndiceEnd     int64  `json:"indice_end"`
+	PostLineStart int64  `json:"post_line_start"`
+	PostLineEnd   int64  `json:"post_line_end"`
 }
 
 type Source struct {
