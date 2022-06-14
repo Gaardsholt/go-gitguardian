@@ -64,7 +64,7 @@ func (c *IncidentsClient) ListOccurrences(lo ListOccurrencesOptions) (*IncidentL
 	}
 
 	if lo.SourceId != nil {
-		q.Add("source_id", string(*lo.SourceId))
+		q.Add("source_id", strconv.Itoa(*lo.SourceId))
 	}
 
 	if lo.SourceName != "" {
@@ -72,7 +72,7 @@ func (c *IncidentsClient) ListOccurrences(lo ListOccurrencesOptions) (*IncidentL
 	}
 
 	if lo.IncidentId != nil {
-		q.Add("incident_id", string(*lo.IncidentId))
+		q.Add("incident_id", strconv.Itoa(*lo.IncidentId))
 	}
 
 	if lo.Presence != nil {
