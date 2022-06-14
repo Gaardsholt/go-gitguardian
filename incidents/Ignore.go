@@ -26,11 +26,11 @@ const (
 	Historical OccurrencesKind = "Historical"
 )
 
-type OccurrencesPresence string
+type Presence string
 
 const (
-	Present OccurrencesPresence = "Present"
-	Removed OccurrencesPresence = "Removed"
+	Present Presence = "Present"
+	Removed Presence = "Removed"
 )
 
 type SourceHealth string
