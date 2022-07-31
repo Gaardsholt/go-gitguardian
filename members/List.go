@@ -7,21 +7,21 @@ import (
 	"strconv"
 )
 
-type SourcesListType string
+type MembersListRole string
 
 const (
-	Owner      SourcesListType = "owner"
-	Manager    SourcesListType = "manager"
-	Member     SourcesListType = "member"
-	Viewer     SourcesListType = "viewer"
-	Restricted SourcesListType = "restricted"
+	Owner      MembersListRole = "owner"
+	Manager    MembersListRole = "manager"
+	Member     MembersListRole = "member"
+	Viewer     MembersListRole = "viewer"
+	Restricted MembersListRole = "restricted"
 )
 
 type ListOptions struct {
 	Page    *int            `json:"page"`     // Page number.
 	PerPage *int            `json:"per_page"` // [ 1 .. 100 ]
 	Search  string          `json:"search"`   // Search members based on their name or email.
-	Role    SourcesListType `json:"role"`     // Filter members based on their role.
+	Role    MembersListRole `json:"role"`     // Filter members based on their role.
 }
 
 func (c *MembersClient) List(lo ListOptions) (*MembersResult, error) {
