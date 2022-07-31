@@ -33,7 +33,7 @@ func (c *IncidentsClient) RevokeAccessSecretIncident(IncidentId int, lo RevokeAc
 		return false, err
 	}
 
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/share", IncidentId), b)
+	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/revoke_access", IncidentId), b)
 	if err != nil {
 		return false, err
 	}

@@ -33,7 +33,7 @@ func (c *IncidentsClient) GrantAccessSecretIncident(IncidentId int, lo GrantAcce
 		return false, err
 	}
 
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/share", IncidentId), b)
+	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/grant_access", IncidentId), b)
 	if err != nil {
 		return false, err
 	}
