@@ -19,15 +19,14 @@ type IncidentListNotesResult struct {
 }
 
 type IncidentListNotesResponse struct {
-	ID         int64       `json:"id"`
-	IncidentID int64       `json:"incident_id"`
-	MemberID   int64       `json:"member_id"`
-	APIToken   interface{} `json:"api_token"`
-	CreatedAt  *time.Time  `json:"created_at"`
-	UpdatedAt  *time.Time  `json:"updated_at"`
-	Comment    string      `json:"comment"`
-	IssueID    int64       `json:"issue_id"`
-	UserID     int64       `json:"user_id"`
+	ID         int64      `json:"id"`
+	IncidentID int64      `json:"incident_id"`
+	MemberID   int64      `json:"member_id"`
+	CreatedAt  *time.Time `json:"created_at"`
+	UpdatedAt  *time.Time `json:"updated_at"`
+	Comment    string     `json:"comment"`
+	IssueID    int64      `json:"issue_id"`
+	UserID     int64      `json:"user_id"`
 }
 
 func (c *IncidentsClient) ListNotes(IncidentId int, lo ListNotesOptions) (*IncidentListNotesResult, error) {
