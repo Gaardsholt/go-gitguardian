@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/peterhellberg/link"
 )
 
 type IncidentsListStatus string
@@ -38,7 +41,7 @@ const (
 )
 
 type ListOptions struct {
-	Page          *int                   `json:"page"`           // Page number.
+	Cursor        string                 `json:"cursor" `        // The pagination cursor
 	PerPage       *int                   `json:"per_page"`       // Number of items to list per page.	[ 1 .. 100 ]
 	DateBefore    *time.Time             `json:"date_before"`    // Entries found before this date.
 	DateAfter     *time.Time             `json:"date_after"`     // Entries found after this date.
@@ -48,10 +51,10 @@ type ListOptions struct {
 	Validity      *IncidentsListValidity `json:"validity"`       // Secrets with the following validity.
 }
 
-func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
+func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *PaginationMeta, error) {
 	req, err := c.client.NewRequest("GET", "/v1/incidents/secrets", nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Add query parameters
@@ -59,16 +62,13 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
-			return nil, fmt.Errorf("PerPage must be between 1 and 100")
+			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
 		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
 
-	if lo.Page != nil {
-		if !(*lo.Page >= 1) {
-			return nil, fmt.Errorf("Page must be geater than zero")
-		}
-		q.Add("page", strconv.Itoa(*lo.Page))
+	if lo.Cursor != "" {
+		q.Add("cursor", string(lo.Cursor))
 	}
 
 	if lo.DateBefore != nil {
@@ -99,7 +99,7 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer r.Body.Close()
 
@@ -108,17 +108,39 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return &IncidentListResult{Error: &target}, fmt.Errorf("%s", target.Detail)
+		return &IncidentListResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
+	var paginationMeta PaginationMeta
 	var target []IncidentListResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	for _, l := range link.Parse(r.Header.Get("Link")) {
+		cursor, err := extractCursor(l.URI)
+		if err != nil {
+			return nil, nil, err
+		}
+		if l.Rel == "next" {
+			paginationMeta.NextCursor = *cursor
+		}
+		if l.Rel == "previous" {
+			paginationMeta.PreviousCursor = *cursor
+		}
 	}
 
-	return &IncidentListResult{Result: target}, nil
+	return &IncidentListResult{Result: target}, &paginationMeta, nil
+}
+
+func extractCursor(uri string) (*string, error) {
+	url, err := url.Parse(uri)
+	if err != nil {
+		return nil, err
+	}
+	cursor := url.Query().Get("cursor")
+	return &cursor, nil
 }

@@ -4,6 +4,11 @@ type Error struct {
 	Detail string `json:"detail"`
 }
 
+type PaginationMeta struct {
+	NextCursor     string
+	PreviousCursor string
+}
+
 type IncidentListResult struct {
 	Result []IncidentListResponse `json:"result"`
 	Error  *Error                 `json:"error"`
