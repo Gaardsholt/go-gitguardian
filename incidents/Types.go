@@ -1,5 +1,9 @@
 package incidents
 
+import (
+	"time"
+)
+
 type Error struct {
 	Detail string `json:"detail"`
 }
@@ -10,21 +14,23 @@ type IncidentListResult struct {
 }
 
 type IncidentListResponse struct {
-	ID               int64    `json:"id"`
-	Date             string   `json:"date"`
-	Detector         Detector `json:"detector"`
-	SecretHash       string   `json:"secret_hash"`
-	GitguardianURL   string   `json:"gitguardian_url"`
-	Regression       bool     `json:"regression"`
-	Status           string   `json:"status"`
-	AssigneeEmail    string   `json:"assignee_email"`
-	OccurrencesCount int64    `json:"occurrences_count"`
-	IgnoreReason     string   `json:"ignore_reason"`
-	IgnoredAt        string   `json:"ignored_at"`
-	SecretRevoked    bool     `json:"secret_revoked"`
-	Severity         string   `json:"severity"`
-	Validity         string   `json:"validity"`
-	ShareURL         string   `json:"share_url"`
+	ID               int64      `json:"id"`
+	Date             time.Time  `json:"date"`
+	Detector         Detector   `json:"detector"`
+	SecretHash       string     `json:"secret_hash"`
+	GitguardianURL   string     `json:"gitguardian_url"`
+	Regression       bool       `json:"regression"`
+	Status           string     `json:"status"`
+	AssigneeEmail    string     `json:"assignee_email"`
+	OccurrencesCount int64      `json:"occurrences_count"`
+	IgnoreReason     string     `json:"ignore_reason"`
+	IgnoredAt        *time.Time `json:"ignored_at"`
+	SecretRevoked    bool       `json:"secret_revoked"`
+	Severity         string     `json:"severity"`
+	Validity         string     `json:"validity"`
+	ResolvedAt       *time.Time `json:"resolved_at"`
+	ShareURL         string     `json:"share_url"`
+	Tags             []string   `json:"tags"`
 }
 
 type Detector struct {
@@ -42,7 +48,7 @@ type IncidentGetResult struct {
 }
 type IncidentGetResponse struct {
 	ID               int64        `json:"id"`
-	Date             string       `json:"date"`
+	Date             time.Time    `json:"date"`
 	Detector         Detector     `json:"detector"`
 	SecretHash       string       `json:"secret_hash"`
 	GitguardianURL   string       `json:"gitguardian_url"`
@@ -54,9 +60,11 @@ type IncidentGetResponse struct {
 	IgnoreReason     string       `json:"ignore_reason"`
 	Severity         string       `json:"severity"`
 	Validity         string       `json:"validity"`
-	IgnoredAt        string       `json:"ignored_at"`
+	IgnoredAt        *time.Time   `json:"ignored_at"`
 	SecretRevoked    bool         `json:"secret_revoked"`
+	ResolvedAt       *time.Time   `json:"resolved_at"`
 	ShareURL         string       `json:"share_url"`
+	Tags             []string     `json:"tags"`
 }
 
 type Occurrence struct {

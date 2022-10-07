@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
 type SourcesListType string
@@ -16,16 +18,16 @@ const (
 )
 
 type ListOptions struct {
-	Page    *int            `json:"page"`
+	Cursor  string          `json:"cursor"`
 	PerPage *int            `json:"per_page"`
 	Search  string          `json:"search"`
 	Type    SourcesListType `json:"type"`
 }
 
-func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, error) {
+func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, *client.PaginationMeta, error) {
 	req, err := c.client.NewRequest("GET", "/v1/sources", nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Add query parameters
@@ -35,8 +37,8 @@ func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, error) {
 		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
 
-	if lo.Page != nil {
-		q.Add("page", strconv.Itoa(*lo.Page))
+	if lo.Cursor != "" {
+		q.Add("cursor", lo.Cursor)
 	}
 
 	q.Add("search", lo.Search)
@@ -45,7 +47,7 @@ func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, error) {
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer r.Body.Close()
 
@@ -54,17 +56,21 @@ func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, error) {
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return &SourcesListResult{Error: &target}, fmt.Errorf("%s", target.Detail)
+		return &SourcesListResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
 	var target []SourcesResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	pagination, err := client.GetPaginationMeta(r)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return &SourcesListResult{Result: target}, nil
+	return &SourcesListResult{Result: target}, pagination, nil
 }

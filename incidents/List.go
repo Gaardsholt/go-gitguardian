@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
 type IncidentsListStatus string
@@ -50,7 +52,7 @@ const (
 )
 
 type ListOptions struct {
-	Page          *int                   `json:"page"`           // Page number.
+	Cursor        string                 `json:"cursor" `        // The pagination cursor
 	PerPage       *int                   `json:"per_page"`       // Number of items to list per page.	[ 1 .. 100 ]
 	DateBefore    *time.Time             `json:"date_before"`    // Entries found before this date.
 	DateAfter     *time.Time             `json:"date_after"`     // Entries found after this date.
@@ -61,10 +63,10 @@ type ListOptions struct {
 	Tags          []IncidentsListTag     `json:"tags"`           // Secrets with the following tags.
 }
 
-func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
+func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *client.PaginationMeta, error) {
 	req, err := c.client.NewRequest("GET", "/v1/incidents/secrets", nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Add query parameters
@@ -72,24 +74,21 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
-			return nil, fmt.Errorf("PerPage must be between 1 and 100")
+			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
 		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
 
-	if lo.Page != nil {
-		if !(*lo.Page >= 1) {
-			return nil, fmt.Errorf("Page must be geater than zero")
-		}
-		q.Add("page", strconv.Itoa(*lo.Page))
+	if lo.Cursor != "" {
+		q.Add("cursor", string(lo.Cursor))
 	}
 
 	if lo.DateBefore != nil {
-		q.Add("date_before", lo.DateBefore.Format("2019-08-30T14:15:22Z"))
+		q.Add("date_before", lo.DateBefore.Format(time.RFC3339Nano))
 	}
 
 	if lo.DateAfter != nil {
-		q.Add("date_after", lo.DateAfter.Format("2019-08-30T14:15:22Z"))
+		q.Add("date_after", lo.DateAfter.Format(time.RFC3339Nano))
 	}
 
 	if lo.Status != nil {
@@ -115,7 +114,7 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer r.Body.Close()
 
@@ -124,19 +123,23 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return &IncidentListResult{Error: &target}, fmt.Errorf("%s", target.Detail)
+		return &IncidentListResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
 	var target []IncidentListResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	pagination, err := client.GetPaginationMeta(r)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return &IncidentListResult{Result: target}, nil
+	return &IncidentListResult{Result: target}, pagination, nil
 }
 
 func joinTags(tags []IncidentsListTag) string {
