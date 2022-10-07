@@ -6,7 +6,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/peterhellberg/link"
 )
+
+type PaginationMeta struct {
+	NextCursor     string
+	PreviousCursor string
+}
 
 type Client struct {
 	Server string // GITGUARDIAN_SERVER
@@ -99,4 +106,30 @@ func WithApiKey(apiKey string) ClientOption {
 		c.ApiKey = apiKey
 		return nil
 	}
+}
+
+func GetPaginationMeta(r *http.Response) (*PaginationMeta, error) {
+	var paginationMeta PaginationMeta
+	for _, l := range link.Parse(r.Header.Get("Link")) {
+		cursor, err := extractCursor(l.URI)
+		if err != nil {
+			return nil, err
+		}
+		if l.Rel == "next" {
+			paginationMeta.NextCursor = *cursor
+		}
+		if l.Rel == "previous" {
+			paginationMeta.PreviousCursor = *cursor
+		}
+	}
+	return &paginationMeta, nil
+}
+
+func extractCursor(uri string) (*string, error) {
+	url, err := url.Parse(uri)
+	if err != nil {
+		return nil, err
+	}
+	cursor := url.Query().Get("cursor")
+	return &cursor, nil
 }
