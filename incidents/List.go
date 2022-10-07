@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
-	"github.com/peterhellberg/link"
+	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
 type IncidentsListStatus string
@@ -51,7 +50,7 @@ type ListOptions struct {
 	Validity      *IncidentsListValidity `json:"validity"`       // Secrets with the following validity.
 }
 
-func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *PaginationMeta, error) {
+func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *client.PaginationMeta, error) {
 	req, err := c.client.NewRequest("GET", "/v1/incidents/secrets", nil)
 	if err != nil {
 		return nil, nil, err
@@ -113,34 +112,16 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *Pagination
 		return &IncidentListResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
-	var paginationMeta PaginationMeta
 	var target []IncidentListResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
 		return nil, nil, err
 	}
-	for _, l := range link.Parse(r.Header.Get("Link")) {
-		cursor, err := extractCursor(l.URI)
-		if err != nil {
-			return nil, nil, err
-		}
-		if l.Rel == "next" {
-			paginationMeta.NextCursor = *cursor
-		}
-		if l.Rel == "previous" {
-			paginationMeta.PreviousCursor = *cursor
-		}
-	}
-
-	return &IncidentListResult{Result: target}, &paginationMeta, nil
-}
-
-func extractCursor(uri string) (*string, error) {
-	url, err := url.Parse(uri)
+	pagination, err := client.GetPaginationMeta(r)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	cursor := url.Query().Get("cursor")
-	return &cursor, nil
+
+	return &IncidentListResult{Result: target}, pagination, nil
 }
