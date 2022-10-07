@@ -37,6 +37,18 @@ const (
 	Cannot_Check    IncidentsListValidity = "cannot_check"
 )
 
+type IncidentsListTag string
+
+const (
+	FromHistoricalScan IncidentsListTag = "FROM_HISTORICAL_SCAN"
+	IgnoredInCheckRun  IncidentsListTag = "IGNORED_IN_CHECK_RUN"
+	Public             IncidentsListTag = "PUBLIC"
+	Regression         IncidentsListTag = "REGRESSION"
+	SensitiveFile      IncidentsListTag = "SENSITIVE_FILE"
+	TestFile           IncidentsListTag = "TEST_FILE"
+	None               IncidentsListTag = "NONE"
+)
+
 type ListOptions struct {
 	Page          *int                   `json:"page"`           // Page number.
 	PerPage       *int                   `json:"per_page"`       // Number of items to list per page.	[ 1 .. 100 ]
@@ -46,6 +58,7 @@ type ListOptions struct {
 	AssigneeEmail string                 `json:"assignee_email"` // Incidents assigned to this email.
 	Severity      *IncidentsListSeverity `json:"severity"`       // Filter incidents by severity.
 	Validity      *IncidentsListValidity `json:"validity"`       // Secrets with the following validity.
+	Tags          []IncidentsListTag     `json:"tags"`           // Secrets with the following tags.
 }
 
 func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
@@ -94,6 +107,9 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 	if lo.Validity != nil {
 		q.Add("validity", string(*lo.Validity))
 	}
+	if len(lo.Tags) > 0 {
+		q.Add("tags", joinTags(lo.Tags))
+	}
 
 	req.URL.RawQuery = q.Encode()
 
@@ -121,4 +137,12 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, error) {
 	}
 
 	return &IncidentListResult{Result: target}, nil
+}
+
+func joinTags(tags []IncidentsListTag) string {
+    var result string
+    for _, tag := range tags {
+	    result = result + string(tag)
+    }
+    return result
 }
