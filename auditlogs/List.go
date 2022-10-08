@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
 type AuditLogsListResult struct {
@@ -14,17 +16,17 @@ type AuditLogsListResult struct {
 }
 
 type AuditLogsListResponse struct {
-	ID          int64   `json:"id"`
-	Date        string  `json:"date"`
-	MemberEmail string  `json:"member_email"`
-	MemberName  string  `json:"member_name"`
-	MemberID    int64   `json:"member_id"`
-	APITokenID  int64   `json:"api_token_id"`
-	IPAddress   string  `json:"ip_address"`
-	TargetIDS   []int64 `json:"target_ids"`
-	ActionType  string  `json:"action_type"`
-	EventName   string  `json:"event_name"`
-	Data        string  `json:"data"`
+	ID          int64                  `json:"id"`
+	Date        time.Time              `json:"date"`
+	MemberEmail string                 `json:"member_email"`
+	MemberName  string                 `json:"member_name"`
+	MemberID    int64                  `json:"member_id"`
+	APITokenID  int64                  `json:"api_token_id"`
+	IPAddress   string                 `json:"ip_address"`
+	TargetIDS   []string               `json:"target_ids"`
+	ActionType  string                 `json:"action_type"`
+	EventName   string                 `json:"event_name"`
+	Data        map[string]interface{} `json:"data"`
 }
 
 type AuditLogsListOptions struct {
@@ -38,10 +40,10 @@ type AuditLogsListOptions struct {
 	MemberEmail string     `json:"member_email"` // Entries matching this member email.
 }
 
-func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, error) {
+func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, *client.PaginationMeta, error) {
 	req, err := c.client.NewRequest("GET", "/v1/audit_logs", nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Add query parameters
@@ -49,12 +51,12 @@ func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, e
 
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
-			return nil, fmt.Errorf("PerPage must be between 1 and 100")
+			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
 		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
 
-	if lo.PerPage != nil {
+	if lo.Cursor != "" {
 		q.Add("cursor", lo.Cursor)
 	}
 
@@ -86,7 +88,7 @@ func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, e
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer r.Body.Close()
 
@@ -95,17 +97,22 @@ func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, e
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return &AuditLogsListResult{Error: &target}, fmt.Errorf("%s", target.Detail)
+		return &AuditLogsListResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
 	var target []AuditLogsListResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &AuditLogsListResult{Result: target}, nil
+	pagination, err := client.GetPaginationMeta(r)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &AuditLogsListResult{Result: target}, pagination, nil
 }
