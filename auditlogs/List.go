@@ -61,11 +61,11 @@ func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, *
 	}
 
 	if lo.DateBefore != nil {
-		q.Add("date_before", lo.DateBefore.Format("2019-08-30T14:15:22Z"))
+		q.Add("date_before", lo.DateBefore.Format(time.RFC3339Nano))
 	}
 
 	if lo.DateAfter != nil {
-		q.Add("date_after", lo.DateAfter.Format("2019-08-30T14:15:22Z"))
+		q.Add("date_after", lo.DateAfter.Format(time.RFC3339Nano))
 	}
 
 	if lo.EventName != "" {
