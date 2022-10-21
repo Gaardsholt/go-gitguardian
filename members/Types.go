@@ -5,11 +5,11 @@ type Error struct {
 }
 
 type MembersResult struct {
-	Result []MembersRepsonse `json:"result"`
+	Result []MembersResponse `json:"result"`
 	Error  *Error            `json:"error"`
 }
 
-type MembersRepsonse struct {
+type MembersResponse struct {
 	ID    int64  `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
