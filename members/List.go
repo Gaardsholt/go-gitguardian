@@ -76,7 +76,7 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 	pagination, err := client.GetPaginationMeta(r)
 	if err != nil {
 		return nil, nil, err
-        }
+	}
 
 	return &MembersResult{Result: target}, pagination, nil
 }
