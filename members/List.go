@@ -66,7 +66,7 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 		return &MembersResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
-	var target []MembersRepsonse
+	var target []MembersResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
@@ -76,7 +76,7 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 	pagination, err := client.GetPaginationMeta(r)
 	if err != nil {
 		return nil, nil, err
-        }
+	}
 
 	return &MembersResult{Result: target}, pagination, nil
 }
