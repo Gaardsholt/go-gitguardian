@@ -1,5 +1,5 @@
 module github.com/Gaardsholt/go-gitguardian
 
-go 1.17
+go 1.19
 
-require github.com/peterhellberg/link v1.1.0
+require github.com/peterhellberg/link v1.2.0
