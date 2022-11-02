@@ -10,6 +10,9 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/main.go",
+      "env": {
+        "GITGUARDIAN_API_KEY": "D09Cc9CBd089DFa9e9332D40199eBdE1dF6f4fa0aAb96C2Ba789851c4C3Ebfb05cef7D5"
+      }
     }
   ]
 }

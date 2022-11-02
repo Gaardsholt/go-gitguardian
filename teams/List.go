@@ -9,16 +9,6 @@ import (
 	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
-type TeamsListRole string
-
-const (
-	Owner      TeamsListRole = "owner"
-	Manager    TeamsListRole = "manager"
-	Team       TeamsListRole = "Team"
-	Viewer     TeamsListRole = "viewer"
-	Restricted TeamsListRole = "restricted"
-)
-
 type ListOptions struct {
 	Cursor   string `json:"cursor"`    // Pagination cursor.
 	PerPage  *int   `json:"per_page"`  // [ 1 .. 100 ]
