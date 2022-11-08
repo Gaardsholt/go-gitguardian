@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -54,6 +55,28 @@ func New(opts ...ClientOption) (*Client, error) {
 	}
 	if client.ApiKey == "" {
 		return nil, fmt.Errorf("GITGUARDIAN_API_KEY is not set")
+	}
+
+	req, err := client.NewRequest("GET", "/v1/health", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := client.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if r.StatusCode != http.StatusOK {
+		var target Error
+		decode := json.NewDecoder(r.Body)
+		err = decode.Decode(&target)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, fmt.Errorf("%s", target.Detail)
 	}
 
 	return &client, nil
@@ -132,4 +155,8 @@ func extractCursor(uri string) (*string, error) {
 	}
 	cursor := url.Query().Get("cursor")
 	return &cursor, nil
+}
+
+type Error struct {
+	Detail string `json:"detail"`
 }

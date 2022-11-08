@@ -1,4 +1,4 @@
-package members
+package teams
 
 import (
 	"encoding/json"
@@ -9,25 +9,15 @@ import (
 	"github.com/Gaardsholt/go-gitguardian/client"
 )
 
-type MembersListRole string
-
-const (
-	Owner      MembersListRole = "owner"
-	Manager    MembersListRole = "manager"
-	Member     MembersListRole = "member"
-	Viewer     MembersListRole = "viewer"
-	Restricted MembersListRole = "restricted"
-)
-
 type ListOptions struct {
-	Cursor  string          `json:"cursor"`   // Pagination cursor.
-	PerPage *int            `json:"per_page"` // [ 1 .. 100 ]
-	Search  string          `json:"search"`   // Search members based on their name or email.
-	Role    MembersListRole `json:"role"`     // Filter members based on their role.
+	Cursor   string `json:"cursor"`    // Pagination cursor.
+	PerPage  *int   `json:"per_page"`  // [ 1 .. 100 ]
+	IsGlobal bool   `json:"is_global"` // Filter on/exclude the "All-incidents" team.
+	Search   string `json:"search"`    // Search teams based on their name.
 }
 
-func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.PaginationMeta, error) {
-	req, err := c.client.NewRequest("GET", "/v1/members", nil)
+func (c *TeamsClient) List(lo ListOptions) (*TeamsResult, *client.PaginationMeta, error) {
+	req, err := c.client.NewRequest("GET", "/v1/teams", nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -47,7 +37,7 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 	}
 
 	q.Add("search", lo.Search)
-	q.Add("role", string(lo.Role))
+	q.Add("is_global", strconv.FormatBool(lo.IsGlobal))
 	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
@@ -63,10 +53,10 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 		if err != nil {
 			return nil, nil, err
 		}
-		return &MembersResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
+		return &TeamsResult{Error: &target}, nil, fmt.Errorf("%s", target.Detail)
 	}
 
-	var target []MembersResponse
+	var target []TeamsResponse
 	decode := json.NewDecoder(r.Body)
 	err = decode.Decode(&target)
 	if err != nil {
@@ -78,5 +68,5 @@ func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.Pagination
 		return nil, nil, err
 	}
 
-	return &MembersResult{Result: target}, pagination, nil
+	return &TeamsResult{Result: target}, pagination, nil
 }
