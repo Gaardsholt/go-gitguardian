@@ -34,7 +34,7 @@ func (c *TeamsClient) Create(lo TeamsCreateOptions) (*TeamsCreateResult, error) 
 	}
 	defer r.Body.Close()
 
-	if r.StatusCode != http.StatusOK {
+	if r.StatusCode != http.StatusCreated {
 		var target Error
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
