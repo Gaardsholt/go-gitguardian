@@ -8,7 +8,7 @@ import (
 )
 
 type TeamsAddMemberOptions struct {
-	MemberId           string             `json:"member_id"`
+	MemberId           int64              `json:"member_id"`
 	TeamPermission     TeamPermission     `json:"team_permission"`
 	IncidentPermission IncidentPermission `json:"incident_permission"`
 }
@@ -20,7 +20,7 @@ func (c *TeamsClient) AddMember(TeamId int, lo TeamsAddMemberOptions) (*ListMemb
 		return nil, err
 	}
 
-	req, err := c.client.NewRequest("POST", "/v1/teams/%d/team_memberships", b)
+	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/team_memberships", TeamId), b)
 	if err != nil {
 		return nil, err
 	}

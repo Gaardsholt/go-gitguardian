@@ -27,10 +27,10 @@ type InvitationsCreateOptions struct {
 type InvitationsCreateRole string
 
 const (
-	Owner   InvitationsCreateRole = "manager"
-	Manager InvitationsCreateRole = "member"
-	Member  InvitationsCreateRole = "viewer"
-	Viewer  InvitationsCreateRole = "restricted"
+	Manager    InvitationsCreateRole = "manager"
+	Member     InvitationsCreateRole = "member"
+	Viewer     InvitationsCreateRole = "viewer"
+	Restricted InvitationsCreateRole = "restricted"
 )
 
 func (c *InvitationsClient) Create(lo InvitationsCreateOptions) (*InvitationsCreateResult, error) {
@@ -51,7 +51,7 @@ func (c *InvitationsClient) Create(lo InvitationsCreateOptions) (*InvitationsCre
 	}
 	defer r.Body.Close()
 
-	if r.StatusCode != http.StatusOK {
+	if r.StatusCode != http.StatusCreated && r.StatusCode != http.StatusOK {
 		var target Error
 		decode := json.NewDecoder(r.Body)
 		err = decode.Decode(&target)
@@ -61,12 +61,15 @@ func (c *InvitationsClient) Create(lo InvitationsCreateOptions) (*InvitationsCre
 		return &InvitationsCreateResult{Error: &target}, fmt.Errorf("%s", target.Detail)
 	}
 
-	var target []InvitationsCreateResponse
-	decode := json.NewDecoder(r.Body)
-	err = decode.Decode(&target)
-	if err != nil {
-		return nil, err
+	if r.StatusCode == http.StatusCreated {
+		var target InvitationsCreateResponse
+		decode := json.NewDecoder(r.Body)
+		err = decode.Decode(&target)
+		if err != nil {
+			return nil, err
+		}
+		return &InvitationsCreateResult{Result: []InvitationsCreateResponse{target}}, nil
 	}
 
-	return &InvitationsCreateResult{Result: target}, nil
+	return nil, fmt.Errorf("user already in the workspace")
 }

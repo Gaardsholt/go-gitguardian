@@ -13,7 +13,7 @@ type TeamPermission string
 
 const (
 	CanManage    TeamPermission = "can_manage"
-	CannotManage TeamPermission = "cannot_manage"
+	CanNotManage TeamPermission = "cannot_manage"
 )
 
 type IncidentPermission string
