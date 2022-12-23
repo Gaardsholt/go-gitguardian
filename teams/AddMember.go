@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -32,12 +33,21 @@ func (c *TeamsClient) AddMember(TeamId int, lo TeamsAddMemberOptions) (*ListMemb
 	defer r.Body.Close()
 
 	if r.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 		var target Error
 		decode := json.NewDecoder(r.Body)
+
 		err = decode.Decode(&target)
 		if err != nil {
 			return nil, err
 		}
+
+		if target.Detail == "" {
+			target.Detail = string(bodyBytes)
+		}
+
 		return &ListMembershipsResult{Error: &target}, fmt.Errorf("%s", target.Detail)
 	}
 
