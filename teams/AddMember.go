@@ -32,7 +32,7 @@ func (c *TeamsClient) AddMember(TeamId int, lo TeamsAddMemberOptions) (*ListMemb
 	}
 	defer r.Body.Close()
 
-	if r.StatusCode != http.StatusOK {
+	if r.StatusCode != http.StatusCreated {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
