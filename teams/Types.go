@@ -17,6 +17,7 @@ type TeamGetResult struct {
 type TeamsResponse struct {
 	ID             int64  `json:"id"`
 	Name           string `json:"name"`
+	Description    string `json:"description"`
 	IsGlobal       bool   `json:"is_global"`
 	GitguardianURL string `json:"gitguardian_url"`
 }
