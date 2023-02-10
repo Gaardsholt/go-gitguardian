@@ -7,11 +7,12 @@ import (
 )
 
 type Update struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (c *TeamsClient) Update(TeamId int, lo Update) (*TeamGetResult, error) {
-	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/secrets/%d", TeamId), nil)
+	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/%d", TeamId), nil)
 	if err != nil {
 		return nil, err
 	}
