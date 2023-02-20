@@ -1,21 +1,13 @@
 package scan
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
 func (c *ScanClient) ContentScan(payload ContentScanPayload) (*ContentScanResult, error) {
-
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(payload)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("POST", "/v1/scan", b)
+	req, err := c.client.NewRequest("POST", "/v1/scan", payload)
 	if err != nil {
 		return nil, err
 	}

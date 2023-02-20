@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,13 +12,7 @@ type Update struct {
 }
 
 func (c *TeamsClient) Update(TeamId int, lo Update) (*TeamGetResult, error) {
-	payload := new(bytes.Buffer)
-	err := json.NewEncoder(payload).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/%d", TeamId), payload)
+	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/%d", TeamId), lo)
 	if err != nil {
 		return nil, err
 	}

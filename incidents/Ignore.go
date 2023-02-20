@@ -1,7 +1,6 @@
 package incidents
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -71,14 +70,7 @@ type IncidentIgnoreError struct {
 }
 
 func (c *IncidentsClient) Ignore(IncidentId int, lo IgnoreOptions) (*IncidentIgnoreResult, error) {
-	b, err := json.Marshal(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	bbuffer := bytes.NewBuffer(b)
-
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/ignore", IncidentId), bbuffer)
+	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/ignore", IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}

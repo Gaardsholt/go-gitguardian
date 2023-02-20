@@ -1,7 +1,6 @@
 package invitations
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -34,13 +33,7 @@ const (
 )
 
 func (c *InvitationsClient) Create(lo InvitationsCreateOptions) (*InvitationsCreateResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("POST", "/v1/invitations", b)
+	req, err := c.client.NewRequest("POST", "/v1/invitations", lo)
 	if err != nil {
 		return nil, err
 	}

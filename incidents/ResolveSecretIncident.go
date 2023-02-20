@@ -1,7 +1,6 @@
 package incidents
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -35,13 +34,7 @@ type ResolveSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) ResolveSecretIncident(IncidentId int, lo ResolveSecretIncidentOptions) (*ResolveSecretIncidentResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/resolve", IncidentId), b)
+	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/resolve", IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}
