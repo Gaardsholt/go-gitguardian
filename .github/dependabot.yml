@@ -5,8 +5,14 @@
 
 version: 2
 updates:
-  - package-ecosystem: "gomod" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "gomod"          # See documentation for possible values
+    directory: "/"                      # Location of package manifests
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - Gaardsholt
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: "/"                      # Location of package manifests
     schedule:
       interval: "monthly"
     reviewers:
