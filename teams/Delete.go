@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type TeamsDeleteResult struct {
@@ -11,7 +13,9 @@ type TeamsDeleteResult struct {
 }
 
 func (c *TeamsClient) Delete(TeamId int) (*TeamsDeleteResult, error) {
-	req, err := c.client.NewRequest("DELETE", fmt.Sprintf("/v1/teams/%d", TeamId), nil)
+	ep := types.Endpoints["TeamsDelete"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), nil)
 	if err != nil {
 		return nil, err
 	}

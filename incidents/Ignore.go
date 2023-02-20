@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type IgnoreReason string
@@ -70,7 +72,9 @@ type IncidentIgnoreError struct {
 }
 
 func (c *IncidentsClient) Ignore(IncidentId int, lo IgnoreOptions) (*IncidentIgnoreResult, error) {
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/ignore", IncidentId), lo)
+	ep := types.Endpoints["IgnoreSecretIncident"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}

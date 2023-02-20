@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type IncidentsListStatus string
@@ -64,7 +65,9 @@ type ListOptions struct {
 }
 
 func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *client.PaginationMeta, error) {
-	req, err := c.client.NewRequest("GET", "/v1/incidents/secrets", nil)
+	ep := types.Endpoints["ListSecretIncidents"]
+
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -143,9 +146,9 @@ func (c *IncidentsClient) List(lo ListOptions) (*IncidentListResult, *client.Pag
 }
 
 func joinTags(tags []IncidentsListTag) string {
-    var result string
-    for _, tag := range tags {
-	    result = result + string(tag)
-    }
-    return result
+	var result string
+	for _, tag := range tags {
+		result = result + string(tag)
+	}
+	return result
 }

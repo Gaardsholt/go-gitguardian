@@ -3,6 +3,8 @@ package incidents
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type GrantAccessSecretIncidentOptions struct {
@@ -25,11 +27,18 @@ type GrantAccessSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) GrantAccessSecretIncident(IncidentId int, lo GrantAccessSecretIncidentOptions) (bool, error) {
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/grant_access", IncidentId), lo)
+	ep := types.Endpoints["GrantAccessSecretIncident"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return false, err
 	}
+	r, err := c.client.Client.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer r.Body.Close()
 
-	return r.Response.StatusCode == http.StatusOK, nil
+	return r.StatusCode == http.StatusOK, nil
 
 }

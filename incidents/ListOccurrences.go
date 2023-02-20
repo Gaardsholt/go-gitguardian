@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type ListOccurrencesOptions struct {
@@ -40,7 +42,9 @@ type IncidentListOccurrencesResponse struct {
 }
 
 func (c *IncidentsClient) ListOccurrences(lo ListOccurrencesOptions) (*IncidentListOccurrencesResult, error) {
-	req, err := c.client.NewRequest("GET", "/v1/occurrences/secrets", nil)
+	ep := types.Endpoints["ListOccurrences"]
+
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, err
 	}

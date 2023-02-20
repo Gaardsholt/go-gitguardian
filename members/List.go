@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type MembersListRole string
@@ -27,7 +28,9 @@ type ListOptions struct {
 }
 
 func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.PaginationMeta, error) {
-	req, err := c.client.NewRequest("GET", "/v1/members", nil)
+	ep := types.Endpoints["MembersList"]
+
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type ListOptions struct {
@@ -17,7 +18,9 @@ type ListOptions struct {
 }
 
 func (c *TeamsClient) List(lo ListOptions) (*TeamsResult, *client.PaginationMeta, error) {
-	req, err := c.client.NewRequest("GET", "/v1/teams", nil)
+	ep := types.Endpoints["TeamsList"]
+
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, nil, err
 	}

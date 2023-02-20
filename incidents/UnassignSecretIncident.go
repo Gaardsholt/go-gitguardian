@@ -3,6 +3,8 @@ package incidents
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type UnassignSecretIncidentResponse struct {
@@ -30,7 +32,9 @@ type UnassignSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) UnassignSecretIncident(IncidentId int) (*UnassignSecretIncidentResult, error) {
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/unassign", IncidentId), nil)
+	ep := types.Endpoints["UnassignSecretIncident"]
+
+	r, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
 	if err != nil {
 		return nil, err
 	}

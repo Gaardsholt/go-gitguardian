@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type InvitationsListResult struct {
@@ -25,7 +27,9 @@ type ListOptions struct {
 }
 
 func (c *InvitationsClient) List(lo ListOptions) (*InvitationsListResult, error) {
-	req, err := c.client.NewRequest("GET", "/v1/invitations", nil)
+	ep := types.Endpoints["InvitationsList"]
+
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, err
 	}

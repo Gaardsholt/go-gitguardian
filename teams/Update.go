@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type Update struct {
@@ -12,7 +14,9 @@ type Update struct {
 }
 
 func (c *TeamsClient) Update(TeamId int, lo Update) (*TeamGetResult, error) {
-	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/%d", TeamId), lo)
+	ep := types.Endpoints["TeamsUpdate"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), lo)
 	if err != nil {
 		return nil, err
 	}

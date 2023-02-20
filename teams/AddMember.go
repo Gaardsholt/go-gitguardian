@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type TeamsAddMemberOptions struct {
@@ -15,7 +17,9 @@ type TeamsAddMemberOptions struct {
 }
 
 func (c *TeamsClient) AddMember(TeamId int, lo TeamsAddMemberOptions) (*ListMembershipsResult, error) {
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/team_memberships", TeamId), lo)
+	ep := types.Endpoints["TeamsAddMember"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), lo)
 	if err != nil {
 		return nil, err
 	}

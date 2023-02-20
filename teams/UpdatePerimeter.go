@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type UpdatePerimeterOptions struct {
@@ -12,6 +14,7 @@ type UpdatePerimeterOptions struct {
 }
 
 func (c *TeamsClient) UpdatePerimeter(TeamId int, lo UpdatePerimeterOptions) error {
+	ep := types.Endpoints["TeamsUpdatePerimeter"]
 
 	// defaults to an empty array, the GitGuardian API wants an empty array, otherwise it will fail.
 	if len(lo.SourcesToAdd) == 0 {
@@ -21,7 +24,7 @@ func (c *TeamsClient) UpdatePerimeter(TeamId int, lo UpdatePerimeterOptions) err
 		lo.SourcesToRemove = []int64{}
 	}
 
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/sources", TeamId), lo)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), lo)
 	if err != nil {
 		return err
 	}
