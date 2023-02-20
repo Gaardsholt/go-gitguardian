@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type TeamPermission string
@@ -45,7 +46,9 @@ type ListMembershipsResult struct {
 }
 
 func (c *TeamsClient) ListMemberships(TeamId int, lo ListMembershipsOptions) (*ListMembershipsResult, *client.PaginationMeta, error) {
-	req, err := c.client.NewRequest("GET", fmt.Sprintf("/v1/teams/%d/team_memberships", TeamId), nil)
+	ep := types.Endpoints["TeamsListMemberships"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), nil)
 	if err != nil {
 		return nil, nil, err
 	}

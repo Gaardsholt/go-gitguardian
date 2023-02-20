@@ -3,6 +3,8 @@ package incidents
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type ResolveSecretIncidentOptions struct {
@@ -34,7 +36,9 @@ type ResolveSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) ResolveSecretIncident(IncidentId int, lo ResolveSecretIncidentOptions) (*ResolveSecretIncidentResult, error) {
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/resolve", IncidentId), lo)
+	ep := types.Endpoints["ResolveSecretIncident"]
+
+	r, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}

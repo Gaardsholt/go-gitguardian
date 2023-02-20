@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type InvitationsResendResult struct {
@@ -11,7 +13,9 @@ type InvitationsResendResult struct {
 }
 
 func (c *InvitationsClient) Resend(InvitationId int) (*InvitationsResendResult, error) {
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/invitations/%d/resend", InvitationId), nil)
+	ep := types.Endpoints["InvitationsResend"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, InvitationId), nil)
 	if err != nil {
 		return nil, err
 	}

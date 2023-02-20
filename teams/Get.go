@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 func (c *TeamsClient) Get(TeamId int) (*TeamGetResult, error) {
-	req, err := c.client.NewRequest("GET", fmt.Sprintf("/v1/teams/%d", TeamId), nil)
+	ep := types.Endpoints["TeamsGet"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), nil)
 	if err != nil {
 		return nil, err
 	}

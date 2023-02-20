@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type UpdateNoteOptions struct {
@@ -28,7 +30,9 @@ type IncidentUpdateNoteResponse struct {
 }
 
 func (c *IncidentsClient) UpdateNote(IncidentId int, NoteId int, lo UpdateNoteOptions) (*IncidentUpdateNoteResult, error) {
-	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/incidents/secrets/%d/notes/%d", IncidentId, NoteId), lo)
+	ep := types.Endpoints["UpdateNote"]
+
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId, NoteId), lo)
 	if err != nil {
 		return nil, err
 	}

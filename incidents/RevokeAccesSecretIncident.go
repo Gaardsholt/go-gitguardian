@@ -3,6 +3,8 @@ package incidents
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type RevokeAccessSecretIncidentOptions struct {
@@ -25,7 +27,9 @@ type RevokeAccessSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) RevokeAccessSecretIncident(IncidentId int, lo RevokeAccessSecretIncidentOptions) (bool, error) {
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/revoke_access", IncidentId), lo)
+	ep := types.Endpoints["RevokeAccessSecretIncident"]
+
+	r, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return false, err
 	}

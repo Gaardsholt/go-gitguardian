@@ -3,6 +3,8 @@ package incidents
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type UnshareSecretIncidentResponse struct {
@@ -30,7 +32,9 @@ type UnshareSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) UnshareSecretIncident(IncidentId int) (bool, error) {
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/unshare", IncidentId), nil)
+	ep := types.Endpoints["UnshareSecretIncident"]
+
+	r, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
 	if err != nil {
 		return false, err
 	}

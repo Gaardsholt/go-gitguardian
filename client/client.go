@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/Gaardsholt/go-gitguardian/types"
 	"github.com/peterhellberg/link"
 )
 
@@ -57,7 +58,8 @@ func New(opts ...ClientOption) (*Client, error) {
 		return nil, fmt.Errorf("GITGUARDIAN_API_KEY is not set")
 	}
 
-	req, err := client.NewRequest("GET", "/v1/health", nil)
+	ep := types.Endpoints["Health"]
+	req, err := client.NewRequest(ep.Operation, ep.Path, nil)
 	if err != nil {
 		return nil, err
 	}
