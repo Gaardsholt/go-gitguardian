@@ -1,7 +1,6 @@
 package incidents
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 )
@@ -27,13 +26,7 @@ type ShareSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) ShareSecretIncident(IncidentId int, lo ShareSecretIncidentOptions) (*ShareSecretIncidentResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/share", IncidentId), b)
+	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/share", IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}

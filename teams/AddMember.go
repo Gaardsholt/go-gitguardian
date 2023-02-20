@@ -15,13 +15,7 @@ type TeamsAddMemberOptions struct {
 }
 
 func (c *TeamsClient) AddMember(TeamId int, lo TeamsAddMemberOptions) (*ListMembershipsResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/team_memberships", TeamId), b)
+	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/team_memberships", TeamId), lo)
 	if err != nil {
 		return nil, err
 	}

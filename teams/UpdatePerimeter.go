@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -22,13 +21,7 @@ func (c *TeamsClient) UpdatePerimeter(TeamId int, lo UpdatePerimeterOptions) err
 		lo.SourcesToRemove = []int64{}
 	}
 
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return err
-	}
-
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/sources", TeamId), b)
+	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/teams/%d/sources", TeamId), lo)
 	if err != nil {
 		return err
 	}

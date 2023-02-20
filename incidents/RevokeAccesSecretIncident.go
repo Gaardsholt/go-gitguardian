@@ -1,8 +1,6 @@
 package incidents
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -27,13 +25,7 @@ type RevokeAccessSecretIncidentResult struct {
 }
 
 func (c *IncidentsClient) RevokeAccessSecretIncident(IncidentId int, lo RevokeAccessSecretIncidentOptions) (bool, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return false, err
-	}
-
-	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/revoke_access", IncidentId), b)
+	r, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/revoke_access", IncidentId), lo)
 	if err != nil {
 		return false, err
 	}

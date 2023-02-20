@@ -1,7 +1,6 @@
 package teams
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,13 +16,7 @@ type TeamsCreateOptions struct {
 }
 
 func (c *TeamsClient) Create(lo TeamsCreateOptions) (*TeamsCreateResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("POST", "/v1/teams", b)
+	req, err := c.client.NewRequest("POST", "/v1/teams", lo)
 	if err != nil {
 		return nil, err
 	}

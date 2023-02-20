@@ -1,7 +1,6 @@
 package incidents
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -29,13 +28,7 @@ type IncidentCreateNoteResponse struct {
 }
 
 func (c *IncidentsClient) CreateNote(IncidentId int, lo CreateNoteOptions) (*IncidentCreateNoteResult, error) {
-	b := new(bytes.Buffer)
-	err := json.NewEncoder(b).Encode(lo)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/notes", IncidentId), b)
+	req, err := c.client.NewRequest("POST", fmt.Sprintf("/v1/incidents/secrets/%d/notes", IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}

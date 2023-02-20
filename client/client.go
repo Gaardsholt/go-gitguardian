@@ -82,7 +82,13 @@ func New(opts ...ClientOption) (*Client, error) {
 	return &client, nil
 }
 
-func (c *Client) NewRequest(method string, path string, payload *bytes.Buffer) (*http.Request, error) {
+func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
+	payload := new(bytes.Buffer)
+	err := json.NewEncoder(payload).Encode(body)
+	if err != nil {
+		return nil, err
+	}
+
 	// Convert server address to *url.URL
 	serverURL, err := url.Parse(c.Server)
 	if err != nil {
