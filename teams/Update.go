@@ -14,7 +14,10 @@ type Update struct {
 
 func (c *TeamsClient) Update(TeamId int, lo Update) (*TeamGetResult, error) {
 	payload := new(bytes.Buffer)
-	json.NewEncoder(payload).Encode(lo)
+	err := json.NewEncoder(payload).Encode(lo)
+	if err != nil {
+		return false, err
+	}
 	req, err := c.client.NewRequest("PATCH", fmt.Sprintf("/v1/teams/%d", TeamId), payload)
 	if err != nil {
 		return nil, err
