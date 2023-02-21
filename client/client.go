@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
+	"github.com/google/go-querystring/query"
 	"github.com/peterhellberg/link"
 )
 
@@ -84,9 +85,9 @@ func New(opts ...ClientOption) (*Client, error) {
 	return &client, nil
 }
 
-func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
-	payload := new(bytes.Buffer)
-	err := json.NewEncoder(payload).Encode(body)
+func (c *Client) NewRequest(method string, path string, payload interface{}) (*http.Request, error) {
+	body := new(bytes.Buffer)
+	err := json.NewEncoder(body).Encode(payload)
 	if err != nil {
 		return nil, err
 	}
@@ -104,10 +105,10 @@ func (c *Client) NewRequest(method string, path string, body interface{}) (*http
 	}
 
 	var req *http.Request
-	if payload == nil {
+	if body == nil {
 		req, err = http.NewRequest(method, queryURL.String(), nil)
 	} else {
-		req, err = http.NewRequest(method, queryURL.String(), payload)
+		req, err = http.NewRequest(method, queryURL.String(), body)
 	}
 
 	if err != nil {
@@ -116,6 +117,12 @@ func (c *Client) NewRequest(method string, path string, body interface{}) (*http
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Token "+c.ApiKey)
+
+	vals, err := query.Values(body)
+	if err != nil {
+		return nil, err
+	}
+	req.URL.RawQuery = vals.Encode()
 
 	return req, nil
 }

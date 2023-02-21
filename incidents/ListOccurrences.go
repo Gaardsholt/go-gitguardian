@@ -4,21 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type ListOccurrencesOptions struct {
-	Cursor     string     `json:"cursor"`      // Pagination cursor.
-	PerPage    *int       `json:"per_page"`    // Number of items to list per page.	[ 1 .. 100 ]
-	DateBefore *time.Time `json:"date_before"` // Entries found before this date.
-	DateAfter  *time.Time `json:"date_after"`  // Entries found after this date.
-	SourceId   *int       `json:"source_id"`   // Filter on the source ID.
-	SourceName string     `json:"source_name"` // Entries matching this source name search.
-	IncidentId *int       `json:"incident_id"` // Filter by incident ID.
-	Presence   *Presence  `json:"presence"`    // Entries that have the following presence status.
+	Cursor     string     `json:"-" url:"cursor"`      // Pagination cursor.
+	PerPage    *int       `json:"-" url:"per_page"`    // Number of items to list per page.	[ 1 .. 100 ]
+	DateBefore *time.Time `json:"-" url:"date_before"` // Entries found before this date.
+	DateAfter  *time.Time `json:"-" url:"date_after"`  // Entries found after this date.
+	SourceId   *int       `json:"-" url:"source_id"`   // Filter on the source ID.
+	SourceName string     `json:"-" url:"source_name"` // Entries matching this source name search.
+	IncidentId *int       `json:"-" url:"incident_id"` // Filter by incident ID.
+	Presence   *Presence  `json:"-" url:"presence"`    // Entries that have the following presence status.
 }
 
 type IncidentListOccurrencesResult struct {
@@ -44,46 +43,17 @@ type IncidentListOccurrencesResponse struct {
 func (c *IncidentsClient) ListOccurrences(lo ListOccurrencesOptions) (*IncidentListOccurrencesResult, error) {
 	ep := types.Endpoints["ListOccurrences"]
 
-	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, lo)
 	if err != nil {
 		return nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	if lo.DateBefore != nil {
-		q.Add("date_before", lo.DateBefore.Format("2019-08-30T14:15:22Z"))
-	}
-
-	if lo.DateAfter != nil {
-		q.Add("date_after", lo.DateAfter.Format("2019-08-30T14:15:22Z"))
-	}
-
-	if lo.SourceId != nil {
-		q.Add("source_id", strconv.Itoa(*lo.SourceId))
-	}
-
-	if lo.SourceName != "" {
-		q.Add("source_name", string(lo.SourceName))
-	}
-
-	if lo.IncidentId != nil {
-		q.Add("incident_id", strconv.Itoa(*lo.IncidentId))
-	}
-
-	if lo.Presence != nil {
-		q.Add("presence", string(*lo.Presence))
-	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
 	"github.com/Gaardsholt/go-gitguardian/types"
@@ -26,11 +25,11 @@ const (
 )
 
 type ListMembershipsOptions struct {
-	Cursor             string             `json:"cursor"`              // Pagination cursor.
-	PerPage            *int               `json:"per_page"`            // [ 1 .. 100 ]
-	TeamPermission     TeamPermission     `json:"team_permission"`     // Filter team memberships with a specific team permission
-	IncidentPermission IncidentPermission `json:"incident_permission"` // Filter team memberships with a specific incident permission
-	MemberId           string             `json:"member_id"`           // Filter team memberships on a specific member
+	Cursor             string             `json:"-" url:"cursor"`              // Pagination cursor.
+	PerPage            *int               `json:"-" url:"per_page"`            // [ 1 .. 100 ]
+	TeamPermission     TeamPermission     `json:"-" url:"team_permission"`     // Filter team memberships with a specific team permission
+	IncidentPermission IncidentPermission `json:"-" url:"incident_permission"` // Filter team memberships with a specific incident permission
+	MemberId           string             `json:"-" url:"member_id"`           // Filter team memberships on a specific member
 }
 
 type ListMembershipsResponse struct {
@@ -48,29 +47,17 @@ type ListMembershipsResult struct {
 func (c *TeamsClient) ListMemberships(TeamId int, lo ListMembershipsOptions) (*ListMembershipsResult, *client.PaginationMeta, error) {
 	ep := types.Endpoints["TeamsListMemberships"]
 
-	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), nil)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, TeamId), lo)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	if lo.Cursor != "" {
-		q.Add("cursor", string(lo.Cursor))
-	}
-
-	q.Add("team_permission", string(lo.TeamPermission))
-	q.Add("incident_permission", string(lo.IncidentPermission))
-	q.Add("member_id", lo.MemberId)
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
@@ -31,63 +30,30 @@ type AuditLogsListResponse struct {
 }
 
 type AuditLogsListOptions struct {
-	Cursor      string     `json:"cursor"`       // Pagination cursor.
-	PerPage     *int       `json:"per_page"`     // Number of items to list per page.	[ 1 .. 100 ]
-	DateBefore  *time.Time `json:"date_before"`  // Entries found before this date.
-	DateAfter   *time.Time `json:"date_after"`   // Entries found after this date.
-	EventName   string     `json:"event_name"`   // Entries matching this event name.
-	MemberId    *int       `json:"member_id"`    // The id of the member to retrieve.
-	MemberName  string     `json:"member_name"`  // Entries matching this member name.
-	MemberEmail string     `json:"member_email"` // Entries matching this member email.
+	Cursor      string     `json:"-" url:"cursor"`       // Pagination cursor.
+	PerPage     *int       `json:"-" url:"per_page"`     // Number of items to list per page.	[ 1 .. 100 ]
+	DateBefore  *time.Time `json:"-" url:"date_before"`  // Entries found before this date.
+	DateAfter   *time.Time `json:"-" url:"date_after"`   // Entries found after this date.
+	EventName   string     `json:"-" url:"event_name"`   // Entries matching this event name.
+	MemberId    *int       `json:"-" url:"member_id"`    // The id of the member to retrieve.
+	MemberName  string     `json:"-" url:"member_name"`  // Entries matching this member name.
+	MemberEmail string     `json:"-" url:"member_email"` // Entries matching this member email.
 }
 
 func (c *AuditLogsClient) List(lo AuditLogsListOptions) (*AuditLogsListResult, *client.PaginationMeta, error) {
 	ep := types.Endpoints["AuditLogsList"]
 
-	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, lo)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	if lo.Cursor != "" {
-		q.Add("cursor", lo.Cursor)
-	}
-
-	if lo.DateBefore != nil {
-		q.Add("date_before", lo.DateBefore.Format(time.RFC3339Nano))
-	}
-
-	if lo.DateAfter != nil {
-		q.Add("date_after", lo.DateAfter.Format(time.RFC3339Nano))
-	}
-
-	if lo.EventName != "" {
-		q.Add("event_name", string(lo.EventName))
-	}
-
-	if lo.MemberId != nil {
-		q.Add("member_id", strconv.Itoa(*lo.MemberId))
-	}
-
-	if lo.MemberName != "" {
-		q.Add("member_name", string(lo.MemberName))
-	}
-
-	if lo.MemberEmail != "" {
-		q.Add("member_email", string(lo.MemberEmail))
-	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

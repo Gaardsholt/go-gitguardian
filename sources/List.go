@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
 	"github.com/Gaardsholt/go-gitguardian/types"
@@ -19,34 +18,19 @@ const (
 )
 
 type ListOptions struct {
-	Cursor  string          `json:"cursor"`
-	PerPage *int            `json:"per_page"`
-	Search  string          `json:"search"`
-	Type    SourcesListType `json:"type"`
+	Cursor  string          `json:"-" url:"cursor"`
+	PerPage *int            `json:"-" url:"per_page"`
+	Search  string          `json:"-" url:"search"`
+	Type    SourcesListType `json:"-" url:"type"`
 }
 
 func (c *SourcesClient) List(lo ListOptions) (*SourcesListResult, *client.PaginationMeta, error) {
 	ep := types.Endpoints["SourcesList"]
 
-	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, lo)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	// Add query parameters
-	q := req.URL.Query()
-
-	if lo.PerPage != nil {
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
-	}
-
-	if lo.Cursor != "" {
-		q.Add("cursor", lo.Cursor)
-	}
-
-	q.Add("search", lo.Search)
-	q.Add("type", string(lo.Type))
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
