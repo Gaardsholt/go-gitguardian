@@ -196,4 +196,14 @@ var Endpoints = map[string]Endpoint{
 		Path:      "/v1/incidents/secrets",
 		Operation: "GET",
 	},
+	"ListSecretInvitations": {
+		Path:      "/v1/incidents/secrets/%d/invitations",
+		ApiPath:   "/v1/incidents/secrets/{incident_id}/invitations",
+		Operation: "GET",
+	},
+	"ListSecretTeams": {
+		Path:      "/v1/incidents/secrets/%d/teams",
+		ApiPath:   "/v1/incidents/secrets/{incident_id}/teams",
+		Operation: "GET",
+	},
 }
