@@ -1,6 +1,6 @@
 module github.com/Gaardsholt/go-gitguardian
 
-go 1.19
+go 1.20
 
 require (
 	github.com/google/go-querystring v1.1.0
