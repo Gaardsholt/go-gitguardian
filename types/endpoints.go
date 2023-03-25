@@ -30,6 +30,11 @@ var Endpoints = map[string]Endpoint{
 		Path:      "/v1/members",
 		Operation: "GET",
 	},
+	"ListTeamMembership": {
+		Path:      "/v1/members/%d/team_memberships",
+		ApiPath:   "/v1/members/{member_id}/team_memberships",
+		Operation: "GET",
+	},
 	"MembersGet": {
 		Path:      "/v1/members/%d",
 		ApiPath:   "/v1/members/{member_id}",
