@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
 )
@@ -22,33 +21,24 @@ type InvitationsListResponse struct {
 }
 
 type ListOptions struct {
-	Cursor  string `json:"cursor"`   // Pagination cursor.
-	PerPage *int   `json:"per_page"` // Number of items to list per page.	[ 1 .. 100 ]
+	Cursor  string `json:"-" url:"cursor"`   // Pagination cursor.
+	PerPage *int   `json:"-" url:"per_page"` // Number of items to list per page.	[ 1 .. 100 ]
 }
 
 func (c *InvitationsClient) List(lo ListOptions) (*InvitationsListResult, error) {
 	ep := types.Endpoints["InvitationsList"]
 
-	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, lo)
 	if err != nil {
 		return nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	if lo.PerPage != nil {
-		q.Add("cursor", lo.Cursor)
-	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

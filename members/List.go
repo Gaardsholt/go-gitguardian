@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/client"
 	"github.com/Gaardsholt/go-gitguardian/types"
@@ -21,37 +20,26 @@ const (
 )
 
 type ListOptions struct {
-	Cursor  string          `json:"cursor"`   // Pagination cursor.
-	PerPage *int            `json:"per_page"` // [ 1 .. 100 ]
-	Search  string          `json:"search"`   // Search members based on their name or email.
-	Role    MembersListRole `json:"role"`     // Filter members based on their role.
+	Cursor  string          `json:"-" url:"cursor"`   // Pagination cursor.
+	PerPage *int            `json:"-" url:"per_page"` // [ 1 .. 100 ]
+	Search  string          `json:"-" url:"search"`   // Search members based on their name or email.
+	Role    MembersListRole `json:"-" url:"role"`     // Filter members based on their role.
 }
 
 func (c *MembersClient) List(lo ListOptions) (*MembersResult, *client.PaginationMeta, error) {
 	ep := types.Endpoints["MembersList"]
 
-	req, err := c.client.NewRequest(ep.Operation, ep.Path, nil)
+	req, err := c.client.NewRequest(ep.Operation, ep.Path, lo)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	if lo.Cursor != "" {
-		q.Add("cursor", string(lo.Cursor))
-	}
-
-	q.Add("search", lo.Search)
-	q.Add("role", string(lo.Role))
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

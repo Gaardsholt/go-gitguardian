@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type ListNotesOptions struct {
-	Cursor  string `json:"cursor"`   // Pagination cursor.
-	PerPage *int   `json:"per_page"` // Number of items to list per page.	[ 1 .. 100 ]
+	Cursor  string `json:"-" url:"cursor"`   // Pagination cursor.
+	PerPage *int   `json:"-" url:"per_page"` // Number of items to list per page.	[ 1 .. 100 ]
 }
 
 type IncidentListNotesResult struct {
@@ -34,22 +33,17 @@ type IncidentListNotesResponse struct {
 func (c *IncidentsClient) ListNotes(IncidentId int, lo ListNotesOptions) (*IncidentListNotesResult, error) {
 	ep := types.Endpoints["ListNotes"]
 
-	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.PerPage != nil {
 		if !(*lo.PerPage >= 1 && *lo.PerPage <= 100) {
 			return nil, fmt.Errorf("PerPage must be between 1 and 100")
 		}
-		q.Add("per_page", strconv.Itoa(*lo.PerPage))
 	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
