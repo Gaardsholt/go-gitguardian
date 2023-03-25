@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
 )
@@ -18,9 +17,9 @@ const (
 )
 
 type ListSecretInvitationsOptions struct {
-	Cursor             string              `json:"cursor"`              // Pagination cursor.
-	InvitationId       *int                `json:"invitation_id"`       // Filter on a specific invitation id.
-	IncidentPermission *IncidentPermission `json:"incident_permission"` // Filter accesses with a specific permission.
+	Cursor             string              `json:"-" url:"cursor"`              // Pagination cursor.
+	InvitationId       *int                `json:"-" url:"invitation_id"`       // Filter on a specific invitation id.
+	IncidentPermission *IncidentPermission `json:"-" url:"incident_permission"` // Filter accesses with a specific permission.
 }
 
 type ListSecretInvitationsResult struct {
@@ -37,22 +36,10 @@ type ListSecretInvitationsResponse struct {
 func (c *IncidentsClient) ListSecretInvitations(IncidentId int, lo ListSecretInvitationsOptions) (*ListSecretInvitationsResult, error) {
 	ep := types.Endpoints["ListSecretInvitations"]
 
-	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}
-
-	// Add query parameters
-	q := req.URL.Query()
-
-	if lo.InvitationId != nil {
-		q.Add("invitation_id", strconv.Itoa(*lo.InvitationId))
-	}
-	if lo.IncidentPermission != nil {
-		q.Add("incident_permission", string(*lo.IncidentPermission))
-	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

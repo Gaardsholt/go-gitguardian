@@ -9,21 +9,16 @@ import (
 )
 
 type Update struct {
-	Severity IncidentsListSeverity `json:"severity"`
+	Severity IncidentsListSeverity `json:"severity" url:"-"`
 }
 
 func (c *IncidentsClient) Update(IncidentId int, lo Update) (*IncidentGetResult, error) {
 	ep := types.Endpoints["UpdateSecretIncidents"]
 
-	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}
-
-	// Add query parameters
-	q := req.URL.Query()
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {

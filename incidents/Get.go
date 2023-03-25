@@ -4,34 +4,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Gaardsholt/go-gitguardian/types"
 )
 
 type GetOptions struct {
-	WithOccurrences *int `json:"with_occurrences"` // Retrieve a number of occurrences of this incident.	[ 1 .. 100 ]
+	WithOccurrences *int `json:"-" url:"with_occurrences"` // Retrieve a number of occurrences of this incident.	[ 1 .. 100 ]
 }
 
 func (c *IncidentsClient) Get(IncidentId int, lo GetOptions) (*IncidentGetResult, error) {
 	ep := types.Endpoints["GetSecretIncidents"]
 
-	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), nil)
+	req, err := c.client.NewRequest(ep.Operation, fmt.Sprintf(ep.Path, IncidentId), lo)
 	if err != nil {
 		return nil, err
 	}
 
-	// Add query parameters
-	q := req.URL.Query()
-
+	// Validate query parameters
 	if lo.WithOccurrences != nil {
 		if !(*lo.WithOccurrences >= 1 && *lo.WithOccurrences <= 100) {
 			return nil, fmt.Errorf("WithOccurrences must be between 1 and 100")
 		}
-		q.Add("with_occurrences", strconv.Itoa(*lo.WithOccurrences))
 	}
-
-	req.URL.RawQuery = q.Encode()
 
 	r, err := c.client.Client.Do(req)
 	if err != nil {
