@@ -184,9 +184,14 @@ var Endpoints = map[string]Endpoint{
 		ApiPath:   "/v1/teams/{team_id}/sources",
 		Operation: "POST",
 	},
+	"TeamsListSources": {
+		Path:      "/v1/teams/%d/sources",
+		ApiPath:   "/v1/teams/{team_id}/sources",
+		Operation: "GET",
+	},
 	"TeamsUpdate": {
 		Path:      "/v1/teams/%d",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "PATCH",
 	},
 	"TeamsListMemberships": {
@@ -200,12 +205,12 @@ var Endpoints = map[string]Endpoint{
 	},
 	"TeamsGet": {
 		Path:      "/v1/teams/%d",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "GET",
 	},
 	"TeamsDelete": {
 		Path:      "/v1/teams/%s",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "DELETE",
 	},
 	"TeamsCreate": {
