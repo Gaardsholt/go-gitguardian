@@ -50,6 +50,16 @@ var Endpoints = map[string]Endpoint{
 		ApiPath:   "/v1/members/{member_id}",
 		Operation: "PATCH",
 	},
+	"MembersListMembersTeams": {
+		Path:      "/v1/members/%d/teams",
+		ApiPath:   "/v1/members/{member_id}/teams",
+		Operation: "GET",
+	},
+	"MembersListMembersTeamRequests": {
+		Path:      "/v1/members/%d/team_requests",
+		ApiPath:   "/v1/members/{member_id}/team_requests",
+		Operation: "GET",
+	},
 	"AuditLogsList": {
 		Path:      "/v1/audit_logs",
 		Operation: "GET",
