@@ -200,12 +200,12 @@ var Endpoints = map[string]Endpoint{
 	},
 	"TeamsGet": {
 		Path:      "/v1/teams/%d",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "GET",
 	},
 	"TeamsDelete": {
 		Path:      "/v1/teams/%s",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "DELETE",
 	},
 	"TeamsCreate": {
