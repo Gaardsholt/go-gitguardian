@@ -184,6 +184,11 @@ var Endpoints = map[string]Endpoint{
 		ApiPath:   "/v1/teams/{team_id}/sources",
 		Operation: "POST",
 	},
+	"TeamsListSources": {
+		Path:      "/v1/teams/%d/sources",
+		ApiPath:   "/v1/teams/{team_id}/sources",
+		Operation: "GET",
+	},
 	"TeamsUpdate": {
 		Path:      "/v1/teams/%d",
 		ApiPath:   "/v1/teams/{teams_id}",
