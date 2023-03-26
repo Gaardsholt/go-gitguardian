@@ -186,7 +186,7 @@ var Endpoints = map[string]Endpoint{
 	},
 	"TeamsUpdate": {
 		Path:      "/v1/teams/%d",
-		ApiPath:   "/v1/teams/{team_id}",
+		ApiPath:   "/v1/teams/{teams_id}",
 		Operation: "PATCH",
 	},
 	"TeamsListMemberships": {
