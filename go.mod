@@ -1,6 +1,6 @@
 module github.com/Gaardsholt/go-gitguardian
 
-go 1.20
+go 1.22
 
 require (
 	github.com/getkin/kin-openapi v0.114.0
